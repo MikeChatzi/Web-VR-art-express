@@ -17,7 +17,7 @@ include ('./connection.php');
 	  <script src="https://code.jquery.com/jquery-3.6.0.min.js "></script>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-		<script>
+	<script>
 		
 			/*
 			*	Ftiaxno to component showhideform gia to antikeimeno poy an to klikaro tha anoigei ti forma
@@ -30,7 +30,7 @@ include ('./connection.php');
 					this.el.addEventListener('click', function (evt) 
 					{
 						console.log('Click on: ', evt.detail.intersection.object.el.id);
-						showHideForm(evt.detail.intersection.object.el.id);
+						
 					});
 					
 				}
@@ -40,7 +40,7 @@ include ('./connection.php');
 			*	H function showHideForm() anoigokleinei ti forma
 			*	mporei na kaleitai apo to component kai apo to X button tis formas
 			*/
-			function showHideForm(id="")
+			function showHideForm()
 			{
 				//console.log(document.getElementById('switch').getAttribute('data-switch'));
 			
@@ -49,7 +49,7 @@ include ('./connection.php');
 					
 					document.getElementById('myDiv').style.display='none';
 					//document.getElementById('player').setAttribute('look-controls', {pointerLockEnabled: true});
-					document.getElementById('objectid').setAttribute('material', {shader: 'flat', color:'white'}); // epanafero to xroma tou antikeimenoy
+					//document.querySelectorAll('[geometry="primitive\: box"]').setAttribute('material', {shader: 'flat', color:'white'}); // epanafero to xroma tou antikeimenoy
 					//document.getElementById('switch').setAttribute('data-switch', -1);
 				}
 				else if (document.getElementById('myDiv').style.display=='none') // an i forma einai kleisti
@@ -58,8 +58,8 @@ include ('./connection.php');
 					//{
 						document.getElementById('myDiv').style.display='block'; // emfanisi formas
 						//document.getElementById('player').setAttribute('look-controls', {enabled: false});
-						document.getElementById(id).setAttribute('material', {shader: 'flat', color:'red'}); // markarisma antikeimenou
-						document.getElementById('objectid').value=id; //('value',id);
+						//document.querySelectorAll('[geometry="primitive\: box"]').setAttribute('material', {shader: 'flat', color:'red'}); // markarisma antikeimenou
+						
 					//}
 					
 					/*
@@ -72,21 +72,44 @@ include ('./connection.php');
 					*/
 				}
 			}
+
+			/* AFRAME.registerComponent('create-boxes',
+			{
+				init: function ()
+				{
+					document.getElementById('btnn').addEventListener('click', function (evt)
+					{
+						var preSrc = document.querySelector('#defbox3').getAttribute('src');
+						var currSrc = 'canva-' + (parseInt(preSrc.split('-')[1]) + 1);
+						var prePos = document.querySelector('#defbox3').getAttribute('position');
+
+						var box = document.createElement('a-entity');
+						box.setAttribute('geometry', 'primitive: box;');
+						box.setAttribute('position', prePos + ' 1 0');
+						box.setAttribute('material', 'src: #' + currSrc);
+
+						document.querySelector('#scene').appendChild(box);
+					}
+					)
+				}
+					
+
+			}
+			); */
 		
-		</script>
+		</script>	
 	  
       
 </head>
 <body>
-	  <div id="myDiv" style="display:none; position:absolute; top:50%; left:30%; z-index:1000; border-style:solid;">
+	  <div id="myDiv" style="display:none; position:absolute; top:50%; left:30%; z-index:10; border-style:solid;">
 			Upload Form
-			<button style="position:absolute; right:0%;" onclick="showHideForm();">X</button> <!-- to X button pou kleinei ti forma -->
-			<form method="post" enctype="multipart/form-data" class="w-50">
-					<?php inputFields("Username","username","","text") ?>
-					<?php inputFields("E-mail","email","","text") ?>
+			<button style="position:absolute; right:0%;" onclick="showHideForm();">X</button>
+			<form id="form" method="post" enctype="multipart/form-data" class="w-50">
+					
 					<?php inputFields("","userfile","","file") ?>
-					<?php inputFields("","objectid","","hidden") ?>
-					<button class="btn btn-dark" type="submit" name="submit">Submit</button>
+					
+					<button id="btnn" class="btn btn-dark" type="submit" name="submit">Submit</button>
 				</form>
 		</div>
 
@@ -94,8 +117,6 @@ include ('./connection.php');
 
 	
 	if (isset($_POST['submit'])){
-		$username=$_POST['username'];
-		$email=$_POST['email'];
 		$files=$_FILES['userfile'];
 		
 		
@@ -110,7 +131,7 @@ include ('./connection.php');
 		if(in_array($truefiletype,$extensions)){
 				$file_upload='passed/'.$filename;
 				move_uploaded_file($filetmpname,$file_upload);
-				$db="insert into `registration` (name,email,userfile) values('$username','$email','$file_upload')";
+				$db="insert into `filez` (userfile) values('$file_upload')";
 				$result=mysqli_query($conn,$db);
 				if(!$result){
 					die(mysqli_error($conn));
@@ -118,25 +139,29 @@ include ('./connection.php');
 				
 		}
 	}
-	$sel="Select userfile from `registration`";
-	$res=mysqli_query($conn,$sel);
-	while($row=mysqli_fetch_assoc($res));{
-		$usedfiles=$row['userfile'];
-	}
 	
-		//echo $usedfiles;
-		//echo <img src='.$usedfiles.' />
 	
 
 
 
 ?>
 		
-		<a-scene>
+		
+
+		<a-scene id="scene" z-index:1">
 	  
 	         <a-assets>
 			     <img id="Wall0" src="textures/Wall01.jpg">
-				<!-- <img id="01" src= php echo ?? -->
+				 <?php 
+				
+				
+	            $res=mysqli_query($conn, 'SELECT id, userfile FROM filez');
+	            while($row=mysqli_fetch_array($res))
+				{
+					echo '<img id="canva-'.$row['id'].'" src="'.$row['userfile'].'">';
+				}
+
+				?>
 			 </a-assets>
 
 	         <a-entity id="player" 
@@ -167,30 +192,35 @@ include ('./connection.php');
                rotation="0 90 0"> 
             </a-entity>
 
-			<a-box id="002" position="9.89 4 0" showhideform class="clickable" data-switch="1" material="shader: flat; color:white;"></a-box>
-
-			<a-entity id="001"
+			<a-entity id="defbox"
+					  material="src: #canva-1"
 					  geometry="primitive: box"
-					  position="9.89 2 0"
-					  scale="0.2 2 2"
-					  showhideform >
-					  <!-- material="src: php echo ??" -->
-			</a-entity>
+					  position="2 0 0"
+					  onclick="showHideForm();"
+					  showhideform>
+					  </a-entity>
 
-			 <a-entity 
-			          geometry="primitive: cylinder; height: 0.2; radius: 0.1"
-					  material="shader: flat; color:white"
-					  position="9.89 0.7 0"
-					  rotation="0 0 90"
-					  data-switch="1">
-					  
-			 </a-entity>
+					  <a-entity id="defbox2"
+					  material="src: #canva-2"
+					  geometry="primitive: box"
+					  position="4 0 0"
+					  onclick="showHideForm();"
+					  showhideform>
+					  </a-entity>
+
+					  <a-entity id="defbox3"
+					  material="src: #canva-3"
+					  geometry="primitive: box"
+					  position="6 0 0"
+					  onclick="showHideForm();"
+					  showhideform>
+					  </a-entity>
 					  
 
 			<a-sky color="#ECECEC"></a-sky>
             </a-scene>
 
-			
+	
 
 			
 			  
