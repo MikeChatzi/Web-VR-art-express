@@ -158,6 +158,8 @@ include ('./connection.php');
 	            $res=mysqli_query($conn, 'SELECT id, userfile FROM filez');
 	            while($row=mysqli_fetch_array($res))
 				{
+			    		$canvases = array();
+			    		$canvases[] = "canva-'.$row['id'].'";
 					echo '<img id="canva-'.$row['id'].'" src="'.$row['userfile'].'">';
 				}
 
@@ -191,7 +193,24 @@ include ('./connection.php');
 			   position="10 5 0"
                rotation="0 90 0"> 
             </a-entity>
+			
+			<?php 
+			
+				for ($i = 0; $i < count($canvases); $i++)
+				{
+					$newBox = "<a-entity id=\"defbox\"
+					  material=\"".$canvases[$i]."\  geometry=\"primitive: box\"
+					  position=\"2 0 0\"
+					  onclick=\"showHideForm();\"
+					  showhideform>
+					  </a-entity>";
+					
+					echo $newBox;
+				}
+			
+			?>
 
+			<!--
 			<a-entity id="defbox"
 					  material="src: #canva-1"
 					  geometry="primitive: box"
@@ -216,7 +235,7 @@ include ('./connection.php');
 					  showhideform>
 					  </a-entity>
 					  
-
+			-->
 			<a-sky color="#ECECEC"></a-sky>
             </a-scene>
 
