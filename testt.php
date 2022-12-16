@@ -198,8 +198,8 @@ include ('./connection.php');
 			
 				for ($i = 0; $i < count($canvases); $i++)
 				{
-					$newBox = "<a-entity id=\"defbox\"
-					  material=\"".$canvases[$i]."\  geometry=\"primitive: box\"
+					$newBox = "<a-entity id=\"defbox".$i."\"
+					  material=\"".$canvases[$i]."\"  geometry=\"primitive: box\"
 					  position=\"2 0 0\"
 					  onclick=\"showHideForm();\"
 					  showhideform>
