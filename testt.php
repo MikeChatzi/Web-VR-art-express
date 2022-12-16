@@ -148,7 +148,7 @@ include ('./connection.php');
 		
 		
 
-		<a-scene id="scene" z-index:1">
+		<a-scene id="scene" style="z-index:1">
 	  
 	         <a-assets>
 			     <img id="Wall0" src="textures/Wall01.jpg">
