@@ -2,7 +2,7 @@
 
 require_once('./functions.php');
 include ('./connection.php');
-
+// ----
 ?>
 
 <!DOCTYPE html>
